@@ -1,17 +1,19 @@
 import os
 import shutil as su
 import argparse as ap
+from PIL import ImageGrab as ig
+from PIL import Image as im
+import datetime as dt
 
 __doc__=\
   """
-  処理内容
-  指定したファイルをbinaryで読み込みtxtとして出力する
+  クリップボードの画像を取得し、txtファイルとして出力する.
+  引数に出力ファイル名を与えられない場合は、'tmp日付'のファイル名とする.
+  出力ファイル形式:png
   """
 
 # CONST
-VERSION = "0.0.1"
-OUTPUT_DIR = "./result"
-OUTPUT_FILE = "template.dat"
+VERSION = "1.0.0"
 
 def main():
     #---------------------------------------------------
@@ -20,33 +22,27 @@ def main():
     parser = ap.ArgumentParser(description=__doc__,
                                formatter_class=ap.RawDescriptionHelpFormatter)
 
-    # must args
-    parser.add_argument("filename", help="target file")
+    # required args
 
-    # option args
+    # optional args
+    parser.add_argument("-f","--filename", type=str,default=None,help="outputfile name/No extension required")
     parser.add_argument("-v", "--version", action="version", version=VERSION)
-    parser.add_argument("-s", "--start", type=int, default=1,help="開始位置[int]")
-    parser.add_argument("-e", "--end"  , type=int, default=0,help="終了位置[int]")
     args = parser.parse_args()
-
-    #---------------------------------------------------
-    # 書き出し先
-    #---------------------------------------------------
-    # 既存であれば削除し新規作成
-    if os.path.isdir(OUTPUT_DIR):
-        su.rmtree(OUTPUT_DIR)
-    os.makedirs(OUTPUT_DIR)
 
     #---------------------------------------------------
     # MAIN処理
     #---------------------------------------------------
     # binaryで読み出し,txtで出力
-    print("start={},end={}".format(args.start,args.end))
-    with open(args.filename, "rb") as rf:
-        data = rf.read()
-        wpath = os.path.join(OUTPUT_DIR,OUTPUT_FILE)
-        with open(wpath, "w") as wf:
-            wf.write(str(data))
+    img = ig.grabclipboard()
+    if isinstance(img,im.Image) :
+        if args.filename:
+            img.save(args.filename + ".png","PNG")
+        else:
+            now = dt.datetime.now()
+            img.save("tmp"+now.strftime("%Y%m%d_%H%M%S") + ".png","PNG")
+            print("saved")
+    else:
+        print("No Image in ClipBoard!")
 
 if __name__ == "__main__":
     main()
