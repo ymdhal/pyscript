@@ -8,7 +8,7 @@ import datetime as dt
 __doc__=\
   """
   クリップボードの画像を取得し、txtファイルとして出力する.
-  引数に出力ファイル名を与えられない場合は、'tmp日付'のファイル名とする.
+  引数に出力ファイル名を与えられない場合は、'tmp_日付'のファイル名とする.
   出力ファイル形式:png
   """
 
@@ -36,10 +36,10 @@ def main():
     img = ig.grabclipboard()
     if isinstance(img,im.Image) :
         if args.filename:
-            img.save(args.filename + ".png","PNG")
+            img.save(args.filename,"PNG")
         else:
             now = dt.datetime.now()
-            img.save("tmp"+now.strftime("%Y%m%d_%H%M%S") + ".png","PNG")
+            img.save("tmp_"+now.strftime("%Y%m%d_%H%M%S") + ".png","PNG")
             print("saved")
     else:
         print("No Image in ClipBoard!")
